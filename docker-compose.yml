@@ -5,6 +5,8 @@ services:
     image: be-project-client:latest
     ports:
       - 12000:12000
+    environment:
+      - HOST
 
   router:
     image: be-project:latest
