@@ -21,7 +21,9 @@ services:
     ports:
       - 6379:6379
 
-  static-files:
-    image: be-project-static-files:latest
+  auth:
+    image: be-project-authentication:latest
     ports:
-      - 8080:8080
+      - 4242:4242
+    environment:
+      REDIS_HOST: redis
