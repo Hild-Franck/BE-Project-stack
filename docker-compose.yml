@@ -1,4 +1,4 @@
-version: "2"
+version: "3"
 
 services:
   client:
@@ -12,16 +12,25 @@ services:
     image: be-project:latest
     ports:
       - 8080:8080
+    depends_on:
+      - redis
     environment:
       REDIS_HOST: redis
       AUTH: auth
-
-  redis:
-    image: redis
 
   auth:
     image: be-project-authentication:latest
     ports:
       - 4242:4242
+    depends_on:
+      - redis
     environment:
       REDIS_HOST: redis
+
+  redis:
+    image: redis
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 1s
+      timeout: 3s
+      retries: 30
