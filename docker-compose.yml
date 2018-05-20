@@ -5,6 +5,7 @@ services:
     image: be-project-client:latest
     ports:
       - 12000:12000
+    tty: true
     environment:
       - HOST
 
@@ -12,6 +13,7 @@ services:
     image: be-project:latest
     ports:
       - 8080:8080
+    tty: true
     depends_on:
       - redis
     environment:
@@ -22,6 +24,7 @@ services:
     image: be-project-authentication:latest
     ports:
       - 4242:4242
+    tty: true
     depends_on:
       - redis
     environment:
