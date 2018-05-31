@@ -4,7 +4,7 @@ services:
   client:
     image: be-project-client:latest
     ports:
-      - 12000:12000
+      - 80:12000
     tty: true
     environment:
       - HOST
