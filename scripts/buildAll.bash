@@ -2,7 +2,7 @@
 
 echo "Building web client..."
 cd ../BE-Project-client || exit 1
-docker build -t be-project-client --build-arg API_URL=http://51.15.236.37:8080 .
+docker build -t be-project-client --build-arg API_URL=51.15.236.37 .
 
 echo "Building router server..."
 cd ../BE-Project-router || exit 1
