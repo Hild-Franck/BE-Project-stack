@@ -1,37 +1,104 @@
-version: "3"
+version: "2.1"
 
 services:
   client:
     image: be-project-client:latest
     ports:
-      - 80:12000
+      - 80:3000
     tty: true
     environment:
-      - HOST
+      PORT: 3000
+
+  nats:
+    image: nats:0.8.0
+    ports:
+      - "8222:8222"
+      - "4222:4222"
+    hostname: nats-server
 
   router:
     image: be-project:latest
     ports:
       - 8080:8080
-    tty: true
+    links:
+      - nats
     depends_on:
-      - redis
+      - nats  
+    tty: true
     environment:
-      REDIS_HOST: redis
-      AUTH: auth
+      NATS_HOST: nats
 
   auth:
     image: be-project-authentication:latest
     ports:
       - 4242:4242
-    tty: true
+    links:
+      - postgres
+      - nats
     depends_on:
-      - redis
+      postgres:
+        condition: service_healthy
+      nats:
+        condition: service_started
+    tty: true
     environment:
+      SECRET: 'my_secret'
+  
+  lobby:
+    image: be-project-lobby:latest
+    ports:
+      - 8081:8081
+    links:
+      - nats
+      - redis
+    depends_on:
+      auth:
+        condition: service_started
+      nats:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    tty: true
+    environment:
+      NATS_HOST: nats
       REDIS_HOST: redis
 
+  game:
+    image: be-project-game:latest
+    ports:
+      - 8082:8082
+    links:
+      - nats
+      - redis
+    depends_on:
+      auth:
+        condition: service_started
+      nats:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    tty: true
+    environment:
+      NATS_HOST: nats
+      REDIS_HOST: redis
+
+  postgres:
+    image: postgres
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pikachu"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    environment:
+      POSTGRES_PASSWORD: 'jesus'
+      POSTGRES_USER: 'pikachu'
+      POSTGRES_DB: 'pikachu'
+  
   redis:
     image: redis
+    ports:
+      - "6379:6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 1s
