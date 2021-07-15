@@ -8,6 +8,7 @@ services:
     tty: true
     environment:
       PORT: 3000
+      API_URL: "http://51.15.236.37:8080"
 
   nats:
     image: nats:0.8.0
